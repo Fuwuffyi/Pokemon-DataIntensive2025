@@ -6,20 +6,26 @@
       <title>Pokemon 1v1 battle</title>
    </head>
    <body>
-      <label for="pokemon_first">First pokemon
-         <select name="pokemon_first" id="pokemon_first">
-            {% for pokemon in pokemon_choices %}
-                <option value="{{ pokemon }}">{{ pokemon }}</option>
-            {% endfor %}
-         </select>
-      </label>
-      <label for="pokemon_second">Second pokemon
-         <select name="pokemon_second" id="pokemon_second">
-            {% for pokemon in pokemon_choices %}
-                <option value="{{ pokemon }}">{{ pokemon }}</option>
-            {% endfor %}
-         </select>
-      </label>
-      <button id="predict_fight">Predict</button>
+      <form action="" method="post">
+         <label for="pokemon_first">First pokemon
+            <select name="pokemon_first" id="pokemon_first">
+               {% for pokemon in pokemon_choices %}
+                     <option value="{{ pokemon }}">{{ pokemon }}</option>
+               {% endfor %}
+            </select>
+         </label>
+         <label for="pokemon_second">Second pokemon
+            <select name="pokemon_second" id="pokemon_second">
+               {% for pokemon in pokemon_choices %}
+                     <option value="{{ pokemon }}">{{ pokemon }}</option>
+               {% endfor %}
+            </select>
+         </label>
+         <button type="submit" id="predict_fight">Predict</button>
+      </form>
+      {% if (winner and confidence) %}
+         <h2>Winner: {{ winner }}</h2>
+         <h2>Confidence score: {{ confidence }}%</h2>
+      {% endif %}
    </body>
 </html>
