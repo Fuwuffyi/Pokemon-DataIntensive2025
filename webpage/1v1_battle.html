@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Pokemon 1v1 battle</title>
+   </head>
+   <body>
+      <label for="pokemon_first">First pokemon
+         <select name="pokemon_first" id="pokemon_first">
+            {% for pokemon in pokemon_choices %}
+                <option value="{{ pokemon }}">{{ pokemon }}</option>
+            {% endfor %}
+         </select>
+      </label>
+      <label for="pokemon_second">Second pokemon
+         <select name="pokemon_second" id="pokemon_second">
+            {% for pokemon in pokemon_choices %}
+                <option value="{{ pokemon }}">{{ pokemon }}</option>
+            {% endfor %}
+         </select>
+      </label>
+      <button id="predict_fight">Predict</button>
+   </body>
+</html>
