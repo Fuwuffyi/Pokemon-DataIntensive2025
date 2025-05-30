@@ -2,4 +2,7 @@
 venv
 
 # BeautifulSoup cache
-./scripts/file_files/
+scripts/file_files/
+
+# Saved models directory
+models/
