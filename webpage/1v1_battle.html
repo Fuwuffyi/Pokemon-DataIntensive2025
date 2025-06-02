@@ -7,24 +7,42 @@
    </head>
    <body>
       <form action="" method="post">
+         <select name="model_file" id="model_file">
+            {% for model in models %}
+               <option value="{{ model }}">{{ model }}</option>
+            {% endfor %}
+         </select>
+         <button type="submit" name="change_model" value="change_model" id="change_model">Change Model</button>
+      </form>
+      <form action="" method="post">
          <label for="pokemon_first">First pokemon
             <select name="pokemon_first" id="pokemon_first">
                {% for pokemon in pokemon_choices %}
+                  {% if pokemon == selected_pokemons[0] %}
+                     <option value="{{ pokemon }}" selected="selected">{{ pokemon }}</option>
+                  {% else %}
                      <option value="{{ pokemon }}">{{ pokemon }}</option>
+                  {% endif %}
                {% endfor %}
             </select>
          </label>
          <label for="pokemon_second">Second pokemon
             <select name="pokemon_second" id="pokemon_second">
                {% for pokemon in pokemon_choices %}
+                  {% if pokemon == selected_pokemons[1] %}
+                     <option value="{{ pokemon }}" selected="selected">{{ pokemon }}</option>
+                  {% else %}
                      <option value="{{ pokemon }}">{{ pokemon }}</option>
+                  {% endif %}
                {% endfor %}
             </select>
          </label>
-         <button type="submit" id="predict_fight">Predict</button>
+         <button type="submit" name="predict_fight" value="predict_fight" id="predict_fight">Predict</button>
       </form>
-      {% if (winner and confidence) %}
+      {% if winner %}
          <h2>Winner: {{ winner }}</h2>
+      {% endif %}
+      {% if confidence %}
          <h2>Confidence score: {{ confidence }}%</h2>
       {% endif %}
    </body>
