@@ -6,3 +6,6 @@ scripts/file_files/
 
 # Saved models directory
 models/
+
+# Cache of python files
+__pycache__/
