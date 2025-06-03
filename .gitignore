@@ -4,6 +4,9 @@ venv
 # BeautifulSoup cache
 scripts/file_files/
 
+# Downloaded sprites
+webpage/img/sprites
+
 # Saved models directory
 models/
 

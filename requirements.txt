@@ -1,9 +1,15 @@
-# Dependencies
+# Module for data science and machine learning projects
 numpy
 pandas
 matplotlib
 seaborn
 scikit-learn
 xgboost
+
+# Web server
 flask
-beatifulsoup4
+
+# For api and web scraping
+beautifulsoup4
+aiohttp
+aiofiles
