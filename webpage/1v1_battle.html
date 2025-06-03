@@ -7,43 +7,105 @@
    </head>
    <body>
       <form action="" method="post">
-         <select name="model_file" id="model_file">
-            {% for model in models %}
-               <option value="{{ model }}">{{ model }}</option>
-            {% endfor %}
-         </select>
-         <button type="submit" name="change_model" value="change_model" id="change_model">Change Model</button>
-      </form>
-      <form action="" method="post">
-         <label for="pokemon_first">First pokemon
+         <label for="model_file">Model: 
+            <select name="model_file" id="model_file">
+               {% for model in models %}
+                  <option value="{{ model }}">{{ model }}</option>
+               {% endfor %}
+            </select>
+         </label>
+         <label for="pokemon_first">First pokemon: 
             <select name="pokemon_first" id="pokemon_first">
                {% for pokemon in pokemon_choices %}
-                  {% if pokemon == selected_pokemons[0] %}
-                     <option value="{{ pokemon }}" selected="selected">{{ pokemon }}</option>
-                  {% else %}
-                     <option value="{{ pokemon }}">{{ pokemon }}</option>
-                  {% endif %}
+                  <option value="{{ pokemon }}">{{ pokemon }}</option>
                {% endfor %}
             </select>
          </label>
-         <label for="pokemon_second">Second pokemon
+         <label for="pokemon_second">Second pokemon: 
             <select name="pokemon_second" id="pokemon_second">
                {% for pokemon in pokemon_choices %}
-                  {% if pokemon == selected_pokemons[1] %}
-                     <option value="{{ pokemon }}" selected="selected">{{ pokemon }}</option>
-                  {% else %}
-                     <option value="{{ pokemon }}">{{ pokemon }}</option>
-                  {% endif %}
+                  <option value="{{ pokemon }}">{{ pokemon }}</option>
                {% endfor %}
             </select>
          </label>
-         <button type="submit" name="predict_fight" value="predict_fight" id="predict_fight">Predict</button>
       </form>
-      {% if winner %}
-         <h2>Winner: {{ winner }}</h2>
-      {% endif %}
-      {% if confidence %}
-         <h2>Confidence score: {{ confidence }}%</h2>
-      {% endif %}
+      <h2 id="winner_element"></h2>
+      <h2 id="confidence_element"></h2>
+      <script>
+         const select_model = document.getElementById('model_file');
+         const select_first = document.getElementById('pokemon_first');
+         const select_second = document.getElementById('pokemon_second');
+
+         const winner_element = document.getElementById('winner_element');
+         const confidence_element = document.getElementById('confidence_element');
+
+         // Set model choice from the server
+         select_model.addEventListener('change', async () => {
+            // Get the model choice
+            const model_name = select_model.value;
+            // Check valid value
+            if (!model_name) {
+               return;
+            }
+            try {
+               // Change server model
+               const resp = await fetch("/change_model", {
+                  method: "POST",
+                  headers: {
+                     "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                     model_file: model_name,
+                  }),
+               }).then(async response => {
+                  if (!response.ok) {
+                     throw new Error("Network response was not OK");
+                  }
+                  console.log("Model changed successfully to: ", model_name);
+               });
+            } catch (err) {
+               console.error("Error changing model: ", err);
+            }
+         });
+
+         // Add event listeners to the pokemon selects to predict the battle outcome
+         [select_first, select_second].forEach((e) => {
+            e.addEventListener('change', async () => {
+               // Get the pokemon choices
+               const p1 = select_first.value;
+               const p2 = select_second.value;
+               // Check valid values
+               if (!p1 || !p2) {
+                  winner_element.innerHTML = "";
+                  confidence_element.innerHTML = "";
+                  return;
+               }
+               try {
+                  // Fetch the prediction from the server
+                  const resp = fetch("/precdict_battle", {
+                     method: "POST",
+                     headers: {
+                        "Content-Type": "application/json",
+                     },
+                     body: JSON.stringify({
+                        pokemon_first: p1,
+                        pokemon_second: p2,
+                     }),
+                  }).then(async response => {
+                     if (!response.ok) {
+                        throw new Error("Network response was not OK");
+                     }
+                     data = await response.json();
+                     winner_element.innerHTML = data.winner;
+                     confidence_element.innerHTML = `${data.confidence}%`;
+                  });
+               } catch (err) {
+                  console.error("Error fetching prediction: ", err);
+                  winner_element.innerHTML = "";
+                  confidence_element.innerHTML = "";
+               }
+            });
+         });
+      </script>
    </body>
 </html>
