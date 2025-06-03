@@ -4,35 +4,92 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Pokemon 1v1 battle</title>
+      <style>
+         *, *::before, *::after {
+            box-sizing: border-box;
+            font-optical-sizing: auto;
+            font-style: normal;
+         }
+
+         html, body, main {
+            margin: 0;
+            padding: 0;
+            height: 100dvh;
+            width: 100dvw;
+         }
+
+         section:first-of-type {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 62%;
+            background: url("/static/img/battle_background.jpg");
+            image-rendering: pixelated;
+            background-size: cover;
+            background-position: bottom;
+            background-repeat: no-repeat;
+            position: relative;
+         }
+
+         section:first-of-type > img {
+            position: absolute;
+            height: 20%;
+            width: auto;
+            max-height: 100%;
+         }
+
+         section:first-of-type > img:first-of-type {
+            left: 35%;
+            bottom: 20%;
+         }
+
+         section:first-of-type > img:last-of-type {
+            right: 40%;
+            top: 35%;
+         }
+
+         section:last-of-type {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 38%;
+         }
+      </style>
    </head>
    <body>
-      <form action="" method="post">
-         <label for="model_file">Model: 
-            <select name="model_file" id="model_file">
-               {% for model in models %}
-                  <option value="{{ model }}">{{ model }}</option>
-               {% endfor %}
-            </select>
-         </label>
-         <label for="pokemon_first">First pokemon: 
-            <select name="pokemon_first" id="pokemon_first">
-               {% for pokemon in pokemon_choices %}
-                  <option value="{{ pokemon }}">{{ pokemon }}</option>
-               {% endfor %}
-            </select>
-         </label>
-         <label for="pokemon_second">Second pokemon: 
-            <select name="pokemon_second" id="pokemon_second">
-               {% for pokemon in pokemon_choices %}
-                  <option value="{{ pokemon }}">{{ pokemon }}</option>
-               {% endfor %}
-            </select>
-         </label>
-      </form>
-      <h2 id="winner_element"></h2>
-      <h2 id="confidence_element"></h2>
-      <img id="first_pokemon_sprite"></img>
-      <img id="second_pokemon_sprite"></img>
+      <main>
+         <section id="battle_section">
+            <img id="first_pokemon_sprite"></img>
+            <img id="second_pokemon_sprite"></img>
+         </section>
+         <section id="stats_section">
+            <form action="" method="post">
+               <label for="model_file">Model: 
+                  <select name="model_file" id="model_file">
+                     {% for model in models %}
+                        <option value="{{ model }}">{{ model }}</option>
+                     {% endfor %}
+                  </select>
+               </label>
+               <label for="pokemon_first">First pokemon: 
+                  <select name="pokemon_first" id="pokemon_first">
+                     {% for pokemon in pokemon_choices %}
+                        <option value="{{ pokemon }}">{{ pokemon }}</option>
+                     {% endfor %}
+                  </select>
+               </label>
+               <label for="pokemon_second">Second pokemon: 
+                  <select name="pokemon_second" id="pokemon_second">
+                     {% for pokemon in pokemon_choices %}
+                        <option value="{{ pokemon }}">{{ pokemon }}</option>
+                     {% endfor %}
+                  </select>
+               </label>
+            </form>
+            <h2 id="winner_element"></h2>
+            <h2 id="confidence_element"></h2>
+         </section>
+      </main>
       <script>
          const select_model = document.getElementById('model_file');
          const select_first = document.getElementById('pokemon_first');
