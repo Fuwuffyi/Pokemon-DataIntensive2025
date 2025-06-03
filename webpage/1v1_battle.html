@@ -31,10 +31,15 @@
       </form>
       <h2 id="winner_element"></h2>
       <h2 id="confidence_element"></h2>
+      <img id="first_pokemon_sprite"></img>
+      <img id="second_pokemon_sprite"></img>
       <script>
          const select_model = document.getElementById('model_file');
          const select_first = document.getElementById('pokemon_first');
          const select_second = document.getElementById('pokemon_second');
+
+         const first_pokemon_sprite = document.getElementById('first_pokemon_sprite');
+         const second_pokemon_sprite = document.getElementById('second_pokemon_sprite');
 
          const winner_element = document.getElementById('winner_element');
          const confidence_element = document.getElementById('confidence_element');
@@ -80,6 +85,11 @@
                   confidence_element.innerHTML = "";
                   return;
                }
+               // Set the pokemon sprites
+               first_pokemon_sprite.src = `/static/img/sprites/${p1}_F.gif`;
+               second_pokemon_sprite.src = `/static/img/sprites/${p2}_S.gif`;
+               first_pokemon_sprite.alt = `${p1} From Behind`;
+               second_pokemon_sprite.alt = `${p2} From Front`;
                try {
                   // Fetch the prediction from the server
                   const resp = fetch("/precdict_battle", {
