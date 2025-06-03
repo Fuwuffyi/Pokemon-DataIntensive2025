@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import unicodedata
 import aiofiles
 import pandas as pd
 import os
@@ -15,9 +16,25 @@ OUTPUT_DIR = os.path.join(SCRIPT_DIR, os.pardir, "webpage", "static", "img", "sp
 MAX_CONCURRENT = 20
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+def remove_accents(text: str) -> str:
+    normalized = unicodedata.normalize('NFKD', text)
+    stripped = ''.join(
+        ch for ch in normalized
+        if not unicodedata.combining(ch)
+    )
+    return stripped
+
 async def download_sprite(session: aiohttp.ClientSession, sem: asyncio.Semaphore, name: str, suffix: str, base_url: str):
    # Generate the key for the URL based on the name
-   key: str = name.lower().replace(" ", "-")
+   key: str = remove_accents(
+      name.lower()
+      .replace("'", "")
+      .replace(".", "")
+      .replace("-", "")
+      .replace("♀", "f")
+      .replace("♂", "m")
+      .replace(" ", "-")
+   )
    if key.startswith("mega-"):
       key = f"{key[5:]}-mega"
    if key.endswith("-small-size"):
