@@ -4,88 +4,104 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Pokemon 1v1 battle</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
       <style>
+         @font-face {
+            font-family: "PixelifySans";
+            src: url("/static/font/PixelifySans.ttf") format("truetype");
+         }
+
          *, *::before, *::after {
             box-sizing: border-box;
             font-optical-sizing: auto;
-            font-style: normal;
+            font-family: "PixelifySans", sans-serif;
+            font-size: 1.25rem;
          }
 
-         html, body, main {
+         html, body {
             margin: 0;
             padding: 0;
             height: 100dvh;
             width: 100dvw;
          }
 
-         section:first-of-type {
+         main {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 62%;
-            background: url("/static/img/battle_background.jpg");
+            height: 100%;
+            width: 100%;
             image-rendering: pixelated;
+            background: url("/static/img/battle_background.jpg");
             background-size: cover;
             background-position: bottom;
             background-repeat: no-repeat;
             position: relative;
          }
 
-         section:first-of-type > img {
+         main > img {
             position: absolute;
-            height: 20%;
-            width: auto;
-            max-height: 100%;
+            image-rendering: pixelated;
          }
 
-         section:first-of-type > img:first-of-type {
-            left: 35%;
+         #first_pokemon_sprite {
+            transform: translateX(-50%);
+            left: 30%;
             bottom: 20%;
          }
 
-         section:first-of-type > img:last-of-type {
-            right: 40%;
-            top: 35%;
+         #second_pokemon_sprite {
+            transform: translateX(50%) translateY(-100%);
+            right: 37.5%;
+            top: 55%;
          }
 
-         section:last-of-type {
+         #prediction_controls {
             display: flex;
-            justify-content: center;
+            position: absolute;
+            flex-direction: column;
             align-items: center;
-            height: 38%;
+            width: min-content;
+            gap: 1rem;
+            top: 0%;
+            left: 0%;
+         }
+
+         #prediction_results {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            gap: 1rem;
          }
       </style>
    </head>
    <body>
       <main>
-         <section id="battle_section">
-            <img id="first_pokemon_sprite"></img>
-            <img id="second_pokemon_sprite"></img>
-         </section>
-         <section id="stats_section">
-            <form action="" method="post">
-               <label for="model_file">Model: 
-                  <select name="model_file" id="model_file">
-                     {% for model in models %}
-                        <option value="{{ model }}">{{ model }}</option>
-                     {% endfor %}
-                  </select>
-               </label>
-               <label for="pokemon_first">First pokemon: 
-                  <select name="pokemon_first" id="pokemon_first">
-                     {% for pokemon in pokemon_choices %}
-                        <option value="{{ pokemon }}">{{ pokemon }}</option>
-                     {% endfor %}
-                  </select>
-               </label>
-               <label for="pokemon_second">Second pokemon: 
-                  <select name="pokemon_second" id="pokemon_second">
-                     {% for pokemon in pokemon_choices %}
-                        <option value="{{ pokemon }}">{{ pokemon }}</option>
-                     {% endfor %}
-                  </select>
-               </label>
+         <img id="first_pokemon_sprite"></img>
+         <img id="second_pokemon_sprite"></img>
+         <section id="prediction_controls">
+            <form>
+               <select name="model_file" id="model_file">
+                  {% for model in models %}
+                     <option value="{{ model }}">{{ model }}</option>
+                  {% endfor %}
+               </select>
+               <select name="pokemon_first" id="pokemon_first">
+                  {% for pokemon in pokemon_choices %}
+                     <option value="{{ pokemon }}">{{ pokemon }}</option>
+                  {% endfor %}
+               </select>
+               <select name="pokemon_second" id="pokemon_second">
+                  {% for pokemon in pokemon_choices %}
+                     <option value="{{ pokemon }}">{{ pokemon }}</option>
+                  {% endfor %}
+               </select>
             </form>
+         </section>
+         <section id="prediction_results">
             <h2 id="winner_element"></h2>
             <h2 id="confidence_element"></h2>
          </section>
@@ -100,6 +116,13 @@
 
          const winner_element = document.getElementById('winner_element');
          const confidence_element = document.getElementById('confidence_element');
+
+         [first_pokemon_sprite, second_pokemon_sprite].forEach((sprite) => {
+            sprite.addEventListener('load', () => {
+               sprite.width = sprite.naturalWidth * 2;
+               sprite.height = sprite.naturalHeight * 2;
+            })
+         });
 
          // Set model choice from the server
          select_model.addEventListener('change', async () => {
@@ -163,8 +186,8 @@
                         throw new Error("Network response was not OK");
                      }
                      data = await response.json();
-                     winner_element.innerHTML = data.winner;
-                     confidence_element.innerHTML = `${data.confidence}%`;
+                     winner_element.innerHTML = `Winner: ${data.winner}`;
+                     confidence_element.innerHTML = `Confidence: ${data.confidence.toFixed(2)}%`;
                   });
                } catch (err) {
                   console.error("Error fetching prediction: ", err);
