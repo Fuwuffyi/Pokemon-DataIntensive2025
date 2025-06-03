@@ -4,10 +4,13 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Pokemon 1v1 battle</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
       <style>
+         :root {
+            --gap_size: 0.25rem;
+            --button_height: 2.5rem;
+            --border_radius: 0.65rem;
+         }
+
          @font-face {
             font-family: "PixelifySans";
             src: url("/static/font/PixelifySans.ttf") format("truetype");
@@ -58,15 +61,43 @@
             top: 55%;
          }
 
+         #top_controls {
+            display: flex;
+            flex-direction: row;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--button_height);
+         }
+
+         #top_controls button {
+            width: 100%;
+            height: var(--button_height);
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: var(--border_radius);
+            margin: var(--gap_size);
+            color: white;
+            background: rgba(0, 0, 0, 0.75);
+            transition: background 0.1s ease-in-out;
+            border: none;
+            cursor: pointer;
+         }
+
+         #top_controls button:hover {
+            background: rgba(165, 165, 165, 0.85);
+         }
+
          #prediction_controls {
             display: flex;
             position: absolute;
             flex-direction: column;
             align-items: center;
             width: min-content;
-            gap: 1rem;
-            top: 0%;
-            left: 0%;
+            gap: var(--gap_size);
+            top: calc(var(--button_height) + 2 * var(--gap_size));
+            left: 0;
          }
 
          #prediction_results {
@@ -74,7 +105,7 @@
             flex-direction: column;
             align-items: center;
             position: absolute;
-            gap: 1rem;
+            gap: var(--gap_size);
          }
       </style>
    </head>
@@ -82,19 +113,23 @@
       <main>
          <img id="first_pokemon_sprite"></img>
          <img id="second_pokemon_sprite"></img>
+         <section id="top_controls">
+            <button id="btn_stats">Stats</button>
+            <button id="btn_create_custom_pkmn">Create Pokemon</button>
+         </section>
          <section id="prediction_controls">
             <form>
-               <select name="model_file" id="model_file">
+               <select id="model_file">
                   {% for model in models %}
                      <option value="{{ model }}">{{ model }}</option>
                   {% endfor %}
                </select>
-               <select name="pokemon_first" id="pokemon_first">
+               <select id="pokemon_first">
                   {% for pokemon in pokemon_choices %}
                      <option value="{{ pokemon }}">{{ pokemon }}</option>
                   {% endfor %}
                </select>
-               <select name="pokemon_second" id="pokemon_second">
+               <select id="pokemon_second">
                   {% for pokemon in pokemon_choices %}
                      <option value="{{ pokemon }}">{{ pokemon }}</option>
                   {% endfor %}
@@ -107,21 +142,72 @@
          </section>
       </main>
       <script>
+         const btn_stats = document.getElementById('btn_stats');
+         const btn_create_custom_pkmn = document.getElementById('btn_create_custom_pkmn');
          const select_model = document.getElementById('model_file');
          const select_first = document.getElementById('pokemon_first');
          const select_second = document.getElementById('pokemon_second');
-
          const first_pokemon_sprite = document.getElementById('first_pokemon_sprite');
          const second_pokemon_sprite = document.getElementById('second_pokemon_sprite');
-
          const winner_element = document.getElementById('winner_element');
          const confidence_element = document.getElementById('confidence_element');
 
+         // Function to calculate the prediction of the battle outcome
+         const calculatePrediction = async () => {
+            // Get the pokemon choices
+            const p1 = select_first.value;
+            const p2 = select_second.value;
+            // Check valid values
+            if (!p1 || !p2) {
+               winner_element.innerHTML = "";
+               confidence_element.innerHTML = "";
+               return;
+            }
+            // Set the pokemon sprites
+            first_pokemon_sprite.src = `/static/img/sprites/${p1}_F.gif`;
+            second_pokemon_sprite.src = `/static/img/sprites/${p2}_S.gif`;
+            first_pokemon_sprite.alt = `${p1} From Behind`;
+            second_pokemon_sprite.alt = `${p2} From Front`;
+            try {
+               // Fetch the prediction from the server
+               const resp = fetch("/precdict_battle", {
+                  method: "POST",
+                  headers: {
+                     "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                     pokemon_first: p1,
+                     pokemon_second: p2,
+                  }),
+               }).then(async response => {
+                  if (!response.ok) {
+                     throw new Error("Network response was not OK");
+                  }
+                  data = await response.json();
+                  winner_element.innerHTML = `Winner: ${data.winner}`;
+                  confidence_element.innerHTML = `Confidence: ${data.confidence.toFixed(2)}%`;
+               });
+            } catch (err) {
+               console.error("Error fetching prediction: ", err);
+               winner_element.innerHTML = "";
+               confidence_element.innerHTML = "";
+            }
+         };
+
+         // Calculate the initial prediction
+         calculatePrediction();
+
+         // Add event listeners to the images to set their size
          [first_pokemon_sprite, second_pokemon_sprite].forEach((sprite) => {
             sprite.addEventListener('load', () => {
-               sprite.width = sprite.naturalWidth * 2;
-               sprite.height = sprite.naturalHeight * 2;
+               sprite.width = sprite.naturalWidth * 3;
+               sprite.height = sprite.naturalHeight * 3;
             })
+         });
+
+         // Add event listeners to the pokemon selects to predict the battle outcome
+         [select_first, select_second].forEach((e) => {
+            e.addEventListener('change', calculatePrediction);
          });
 
          // Set model choice from the server
@@ -151,50 +237,6 @@
             } catch (err) {
                console.error("Error changing model: ", err);
             }
-         });
-
-         // Add event listeners to the pokemon selects to predict the battle outcome
-         [select_first, select_second].forEach((e) => {
-            e.addEventListener('change', async () => {
-               // Get the pokemon choices
-               const p1 = select_first.value;
-               const p2 = select_second.value;
-               // Check valid values
-               if (!p1 || !p2) {
-                  winner_element.innerHTML = "";
-                  confidence_element.innerHTML = "";
-                  return;
-               }
-               // Set the pokemon sprites
-               first_pokemon_sprite.src = `/static/img/sprites/${p1}_F.gif`;
-               second_pokemon_sprite.src = `/static/img/sprites/${p2}_S.gif`;
-               first_pokemon_sprite.alt = `${p1} From Behind`;
-               second_pokemon_sprite.alt = `${p2} From Front`;
-               try {
-                  // Fetch the prediction from the server
-                  const resp = fetch("/precdict_battle", {
-                     method: "POST",
-                     headers: {
-                        "Content-Type": "application/json",
-                     },
-                     body: JSON.stringify({
-                        pokemon_first: p1,
-                        pokemon_second: p2,
-                     }),
-                  }).then(async response => {
-                     if (!response.ok) {
-                        throw new Error("Network response was not OK");
-                     }
-                     data = await response.json();
-                     winner_element.innerHTML = `Winner: ${data.winner}`;
-                     confidence_element.innerHTML = `Confidence: ${data.confidence.toFixed(2)}%`;
-                  });
-               } catch (err) {
-                  console.error("Error fetching prediction: ", err);
-                  winner_element.innerHTML = "";
-                  confidence_element.innerHTML = "";
-               }
-            });
          });
       </script>
    </body>
