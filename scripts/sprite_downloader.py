@@ -9,8 +9,9 @@ BASE_URLS = {
    "S": "https://play.pokemonshowdown.com/sprites/ani/"
 }
 
-CSV_PATH = '../datasets/pokemon.csv'
-OUTPUT_DIR = "../webpage/img/sprites"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH = os.path.join(SCRIPT_DIR, os.pardir, "datasets", "pokemon.csv")
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, os.pardir, "webpage", "static", "img", "sprites")
 MAX_CONCURRENT = 20
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

@@ -5,7 +5,7 @@ venv
 scripts/file_files/
 
 # Downloaded sprites
-webpage/img/sprites
+webpage/static/img/sprites
 
 # Saved models directory
 models/
