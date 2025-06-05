@@ -6,9 +6,9 @@
       <title>Pokemon 1v1 battle</title>
       <style>
          :root {
-            --gap_size: 0.25rem;
-            --button_height: 2.5rem;
-            --border_radius: 0.65rem;
+            --gap-size: 0.25rem;
+            --button-height: 2.5rem;
+            --border-radius: 0.65rem;
          }
 
          @font-face {
@@ -16,76 +16,74 @@
             src: url("/static/font/PokeClassic.ttf") format("truetype");
          }
 
-         *, *::before, *::after {
+         *,
+         *::before,
+         *::after {
             box-sizing: border-box;
-            font-optical-sizing: auto;
             font-family: "Pokemon Classic", sans-serif;
-            font-size: 1.0rem;
+            font-optical-sizing: auto;
+            font-size: 1rem;
+            -webkit-font-smoothing: none;
             font-smooth: never;
-            -webkit-font-smoothing : none;
          }
 
          html, body {
-            overflow: hidden;
             margin: 0;
             padding: 0;
-            height: 100dvh;
             width: 100dvw;
+            height: 100dvh;
+            overflow: hidden;
          }
 
          main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-            image-rendering: pixelated;
-            background: url("/static/img/battle_background.jpg");
-            background-size: cover;
-            background-position: bottom;
-            background-repeat: no-repeat;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: url("/static/img/battle_background.jpg") no-repeat bottom/cover;
+            image-rendering: pixelated;
          }
-
+         
          main > img {
             position: absolute;
             image-rendering: pixelated;
          }
 
          #first_pokemon_sprite {
-            transform: translateX(-50%);
             left: 30%;
             bottom: 20%;
+            transform: translateX(-50%);
          }
 
          #second_pokemon_sprite {
-            transform: translateX(50%) translateY(-100%);
             right: 37.5%;
             top: 55%;
+            transform: translateX(50%) translateY(-100%);
          }
 
          #top_controls {
-            display: flex;
-            flex-direction: row;
             position: absolute;
             top: 0;
             left: 0;
+            display: flex;
             width: 100%;
-            height: var(--button_height);
+            height: var(--button-height);
          }
 
          #top_controls button {
-            width: 100%;
-            height: var(--button_height);
+            flex: 1;
+            height: var(--button-height);
+            margin: var(--gap-size);
             font-size: 1.5rem;
             font-weight: bold;
-            border-radius: var(--border_radius);
-            margin: var(--gap_size);
             color: white;
             background: rgba(0, 0, 0, 0.75);
-            transition: background 0.1s ease-in-out;
             border: none;
+            border-radius: var(--border-radius);
             cursor: pointer;
+            transition: background 0.1s ease-in-out;
          }
 
          #top_controls button:hover {
@@ -93,33 +91,32 @@
          }
 
          #prediction_controls {
-            display: flex;
             position: absolute;
+            top: calc(var(--button-height) + 2 * var(--gap-size));
+            left: 0;
+            display: flex;
             flex-direction: column;
             align-items: center;
+            gap: var(--gap-size);
             width: min-content;
-            gap: var(--gap_size);
-            top: calc(var(--button_height) + 2 * var(--gap_size));
-            left: 0;
          }
 
          #prediction_results {
-            color: white;
-            text-shadow: 0 0 5px black;
             position: absolute;
-            left: 50%;
             top: 10%;
+            left: 50%;
             transform: translateX(-50%);
             display: flex;
             align-items: center;
-            position: absolute;
-            gap: var(--gap_size);
+            gap: var(--gap-size);
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.75);
          }
 
          #prediction_results h2 {
-            font-size: 1.2rem;
             margin: 0;
             padding: 0;
+            font-size: 1.2rem;
          }
 
          #stats_first_pokemon, #stats_second_pokemon {
@@ -132,39 +129,38 @@
             justify-content: center;
             background-color: rgba(0, 0, 0, 0.75);
             color: white;
-            border-radius: var(--border_radius);
+            border-radius: var(--border-radius);
             transition: transform 0.4s ease-in-out;
+            overflow: hidden;
          }
 
          #stats_first_pokemon.hidden {
-            transform: translate(-100%, 100%);
-         }
-         #stats_second_pokemon.hidden {
-            transform: translate(100%, 100%);
+            transform: translateX(var(--hide-x)) translateY(100%);
          }
 
          #stats_first_pokemon img:first-of-type, #stats_second_pokemon img:first-of-type {
-            image-rendering: optimizeQuality;
             width: auto;
             height: 100%;
+            image-rendering: optimizeQuality;
          }
 
          #stats_first_pokemon {
+            --hide-x: -100%;
             left: 0;
             bottom: 0;
          }
 
          #stats_second_pokemon {
+            --hide-x: 100%;
             right: 0;
             bottom: 0;
          }
 
          .first_type, .second_type {
-            image-rendering: pixelated;
             position: absolute;
+            top: var(--gap-size);
             width: 4rem;
-            height: auto;
-            top: var(--gap_size);
+            image-rendering: pixelated;
          }
 
          .first_type {
