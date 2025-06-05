@@ -59,6 +59,10 @@ async def download_sprite(session: aiohttp.ClientSession, sem: asyncio.Semaphore
       key = f"{key[:len(key) - 6]}"
    if key.endswith("-normal"):
       key = f"{key[:len(key) - 7]}"
+   if key.endswith("-female"):
+      key = f"{key[:len(key) - 7]}-f"
+   if key.endswith("-male"):
+      key = f"{key[:len(key) - 5]}"
    # Construct the URL and filename
    url: str = f"{base_url}{key}.gif"
    filename: str = f"{name}_{suffix}.gif"
