@@ -134,7 +134,7 @@
             overflow: hidden;
          }
 
-         #stats_first_pokemon.hidden {
+         #stats_first_pokemon.hidden, #stats_second_pokemon.hidden {
             transform: translateX(var(--hide-x)) translateY(100%);
          }
 
@@ -203,12 +203,12 @@
             <h2 id="winner_element"></h2>
             <h2 id="confidence_element"></h2>
          </section>
-         <section id="stats_first_pokemon">
+         <section id="stats_first_pokemon" class="hidden">
             <img id="stats_first_pokemon_radial" />
             <img class="first_type" id="stats_first_pokemon_type_1" src="/static/img/types/Bug.png" />
             <img class="second_type" id="stats_first_pokemon_type_2" src="/static/img/types/Bug.png" />
          </section>
-         <section id="stats_second_pokemon">
+         <section id="stats_second_pokemon" class="hidden">
             <img id="stats_second_pokemon_radial" />
             <img class="first_type" id="stats_second_pokemon_type_1" src="/static/img/types/Bug.png" />
             <img class="second_type" id="stats_second_pokemon_type_2" src="/static/img/types/Bug.png" />
