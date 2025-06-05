@@ -12,15 +12,18 @@
          }
 
          @font-face {
-            font-family: "PixelifySans";
-            src: url("/static/font/PixelifySans.ttf") format("truetype");
+            font-family: "Pokemon Classic";
+            src: url("/static/font/PokeClassic.ttf") format("truetype");
          }
 
          *, *::before, *::after {
             box-sizing: border-box;
             font-optical-sizing: auto;
-            font-family: "PixelifySans", sans-serif;
-            font-size: 1.25rem;
+            font-family: "Pokemon Classic", sans-serif;
+            font-size: 1.0rem;
+
+            font-smooth: never;
+            -webkit-font-smoothing : none;
          }
 
          html, body {
@@ -119,7 +122,6 @@
             justify-content: center;
             background-color: rgba(0, 0, 0, 0.75);
             color: white;
-            font-size: 1.25rem;
             border-radius: var(--border_radius);
             transition: transform 0.4s ease-in-out;
          }
