@@ -174,8 +174,8 @@
    </head>
    <body>
       <main>
-         <img id="first_pokemon_sprite"></img>
-         <img id="second_pokemon_sprite"></img>
+         <img id="first_pokemon_sprite" />
+         <img id="second_pokemon_sprite" />
          <section id="top_controls">
             <button id="btn_stats">Stats</button>
             <button id="btn_create_custom_pkmn">Create Pokemon</button>
@@ -204,164 +204,153 @@
             <h2 id="confidence_element"></h2>
          </section>
          <section id="stats_first_pokemon">
-            <img id="stats_first_pokemon_radial"></img>
-            <img class="first_type" id="stats_first_pokemon_type_1" src="/static/img/types/Bug.png"></img>
-            <img class="second_type" id="stats_first_pokemon_type_2" src="/static/img/types/Bug.png"></img>
+            <img id="stats_first_pokemon_radial" />
+            <img class="first_type" id="stats_first_pokemon_type_1" src="/static/img/types/Bug.png" />
+            <img class="second_type" id="stats_first_pokemon_type_2" src="/static/img/types/Bug.png" />
          </section>
          <section id="stats_second_pokemon">
-            <img id="stats_second_pokemon_radial"></img>
-            <img class="first_type" id="stats_second_pokemon_type_1" src="/static/img/types/Bug.png"></img>
-            <img class="second_type" id="stats_second_pokemon_type_2" src="/static/img/types/Bug.png"></img>
+            <img id="stats_second_pokemon_radial" />
+            <img class="first_type" id="stats_second_pokemon_type_1" src="/static/img/types/Bug.png" />
+            <img class="second_type" id="stats_second_pokemon_type_2" src="/static/img/types/Bug.png" />
          </section>
       </main>
       <script>
-         const btn_stats = document.getElementById('btn_stats');
-         const btn_create_custom_pkmn = document.getElementById('btn_create_custom_pkmn');
+         const btnStats = document.getElementById('btn_stats');
+         const selectModel = document.getElementById('model_file');
+         const selectFirst = document.getElementById('pokemon_first');
+         const selectSecond = document.getElementById('pokemon_second');
+         const firstSprite = document.getElementById('first_pokemon_sprite');
+         const secondSprite = document.getElementById('second_pokemon_sprite');
+         const statsFirstRadial = document.getElementById('stats_first_pokemon_radial');
+         const statsSecondRadial = document.getElementById('stats_second_pokemon_radial');
+         const statsFirstType1 = document.getElementById('stats_first_pokemon_type_1');
+         const statsFirstType2 = document.getElementById('stats_first_pokemon_type_2');
+         const statsSecondType1 = document.getElementById('stats_second_pokemon_type_1');
+         const statsSecondType2 = document.getElementById('stats_second_pokemon_type_2');
+         const statsFirstContainer = document.getElementById('stats_first_pokemon');
+         const statsSecondContainer = document.getElementById('stats_second_pokemon');
+         const winnerElement = document.getElementById('winner_element');
+         const confidenceElement = document.getElementById('confidence_element');
 
-         const select_model = document.getElementById('model_file');
-         const select_first = document.getElementById('pokemon_first');
-         const select_second = document.getElementById('pokemon_second');
+         const resizeSprite = (sprite) => {
+            const naturalWidth = sprite.naturalWidth;
+            const naturalHeight = sprite.naturalHeight;
+            const scaledWidth = naturalWidth * 3;
+            const scaledHeight = naturalHeight * 3;
+            sprite.width = scaledWidth;
+            sprite.height = scaledHeight;
+         };
 
-         const first_pokemon_sprite = document.getElementById('first_pokemon_sprite');
-         const second_pokemon_sprite = document.getElementById('second_pokemon_sprite');
+         [firstSprite, secondSprite].forEach((sprite) => {
+            // When the image finishes loading, compute its size
+            sprite.addEventListener('load', () => resizeSprite(sprite));
+         });
 
-         const stats_first_pokemon_radial = document.getElementById('stats_first_pokemon_radial');
-         const stats_second_pokemon_radial = document.getElementById('stats_second_pokemon_radial');
+         // If the user resizes the window, recompute sizes of already‐loaded sprites
+         window.addEventListener('resize', () => {
+            [firstSprite, secondSprite].forEach((sprite) => {
+               if (sprite.complete && sprite.naturalWidth) {
+                  resizeSprite(sprite);
+               }
+            });
+         });
 
-         const stats_first_pokemon_type_1 = document.getElementById('stats_first_pokemon_type_1');
-         const stats_first_pokemon_type_2 = document.getElementById('stats_first_pokemon_type_2');
-         const stats_second_pokemon_type_1 = document.getElementById('stats_second_pokemon_type_1');
-         const stats_second_pokemon_type_2 = document.getElementById('stats_second_pokemon_type_2');
-
-         const stats_first_pokemon_container = document.getElementById('stats_first_pokemon');
-         const stats_second_pokemon_container = document.getElementById('stats_second_pokemon');
-
-         const winner_element = document.getElementById('winner_element');
-         const confidence_element = document.getElementById('confidence_element');
-
-         // Function to calculate the prediction of the battle outcome
-         const calculatePrediction = async () => {
-            // Get the pokemon choices
-            const p1 = select_first.value;
-            const p2 = select_second.value;
-            // Check valid values
+         function updateStats() {
+            const p1 = selectFirst.value;
+            const p2 = selectSecond.value;
+            // If either select is empty, clear the stats panels
             if (!p1 || !p2) {
-               winner_element.innerHTML = "";
-               confidence_element.innerHTML = "";
+               statsFirstRadial.src = '';
+               statsSecondRadial.src = '';
                return;
             }
-            // Set the pokemon sprites
-            first_pokemon_sprite.src = `/static/img/sprites/${p1}_F.gif`;
-            second_pokemon_sprite.src = `/static/img/sprites/${p2}_S.gif`;
-            first_pokemon_sprite.alt = `${p1} From Behind`;
-            second_pokemon_sprite.alt = `${p2} From Front`;
-            // Update the stats graphs
+            // Radial stats graphs
+            statsFirstRadial.src = `/pokemon/${encodeURIComponent(p1)}/radial_stats.png`;
+            statsSecondRadial.src = `/pokemon/${encodeURIComponent(p2)}/radial_stats.png`;
+            // Type icons (make sure "None" means no second‐type)
+            const getTypeData = (selectEl) => {
+               const opt = selectEl.options[selectEl.selectedIndex];
+               return {
+                  type1: opt.dataset.typeFirst,
+                  type2: opt.dataset.typeSecond
+               };
+            };
+            const { type1: p1t1, type2: p1t2 } = getTypeData(selectFirst);
+            const { type1: p2t1, type2: p2t2 } = getTypeData(selectSecond);
+            statsFirstType1.src = `/static/img/types/${encodeURIComponent(p1t1)}.png`;
+            statsFirstType2.src = p1t2 !== 'None' ? `/static/img/types/${encodeURIComponent(p1t2)}.png` : '';
+            statsSecondType1.src = `/static/img/types/${encodeURIComponent(p2t1)}.png`;
+            statsSecondType2.src = p2t2 !== 'None' ? `/static/img/types/${encodeURIComponent(p2t2)}.png` : '';
+         }
+
+         async function calculatePrediction() {
+            const p1 = selectFirst.value;
+            const p2 = selectSecond.value;
+            if (!p1 || !p2) {
+               winnerElement.textContent     = '';
+               confidenceElement.textContent = '';
+               return;
+            }
+            firstSprite.src = `/static/img/sprites/${encodeURIComponent(p1)}_F.gif`;
+            secondSprite.src = `/static/img/sprites/${encodeURIComponent(p2)}_S.gif`;
+            firstSprite.alt = `${p1} (back view)`;
+            secondSprite.alt = `${p2} (front view)`;
             updateStats();
             try {
-               // Fetch the prediction from the server
-               const resp = fetch("/precdict_battle", {
-                  method: "POST",
-                  headers: {
-                     "Content-Type": "application/json",
-                  },
+               const response = await fetch('/precdict_battle', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                     pokemon_first: p1,
-                     pokemon_second: p2,
-                  }),
-               }).then(async response => {
-                  if (!response.ok) {
-                     throw new Error("Network response was not OK");
-                  }
-                  data = await response.json();
-                  winner_element.innerHTML = `Winner: ${data.winner}`;
-                  confidence_element.innerHTML = `(${data.confidence.toFixed(2)}% confident)`;
+                     pokemon_first:  p1,
+                     pokemon_second: p2
+                  })
                });
-            } catch (err) {
-               console.error("Error fetching prediction: ", err);
-               winner_element.innerHTML = "";
-               confidence_element.innerHTML = "";
+               if (!response.ok) {
+                  throw new Error(`Server responded with status ${response.status}`);
+               }
+               const data = await response.json();
+               winnerElement.textContent = `Winner: ${data.winner}`;
+               confidenceElement.textContent = `(${(data.confidence).toFixed(2)}% confident)`;
             }
-         };
-
-         const updateStats = async () => {
-            // Get the pokemon choices
-            const p1 = select_first.value;
-            const p2 = select_second.value;
-            // Check valid values
-            if (!p1 || !p2) {
-               stats_first_pokemon_radial.src = "";
-               stats_second_pokemon_radial.src = "";
-               return;
+            catch (err) {
+               console.error('Error fetching prediction:', err);
+               winnerElement.textContent = '';
+               confidenceElement.textContent = '';
             }
-            // Set the pokemon radial stats images
-            stats_first_pokemon_radial.src = `/pokemon/${p1}/radial_stats.png`;
-            stats_second_pokemon_radial.src = `/pokemon/${p2}/radial_stats.png`;
-            // Get the pokemon types
-            const p1_type1 = select_first.options[select_first.selectedIndex].dataset.typeFirst;
-            const p1_type2 = select_first.options[select_first.selectedIndex].dataset.typeSecond;
-            const p2_type1 = select_second.options[select_second.selectedIndex].dataset.typeFirst;
-            const p2_type2 = select_second.options[select_second.selectedIndex].dataset.typeSecond;
-            // Set the type images
-            stats_first_pokemon_type_1.src = `/static/img/types/${p1_type1}.png`;
-            stats_first_pokemon_type_2.src = p1_type2 != 'None' ? `/static/img/types/${p1_type2}.png` : '';
-            stats_second_pokemon_type_1.src = `/static/img/types/${p2_type1}.png`;
-            stats_second_pokemon_type_2.src = p2_type2 != 'None' ? `/static/img/types/${p2_type2}.png` : '';
-         };
+         }
 
-         const updateUi = async () => {
-            updateStats();
-            calculatePrediction();
-         };
-
-         // Calculate the initial prediction
-         updateUi();
-
-         // Add event listeners to the images to set their size
-         [first_pokemon_sprite, second_pokemon_sprite].forEach((sprite) => {
-            sprite.addEventListener('load', () => {
-               sprite.width = sprite.naturalWidth * 3;
-               sprite.height = sprite.naturalHeight * 3;
-            })
-         });
-
-         // Add event listeners to the pokemon selects to predict the battle outcome
-         [select_first, select_second].forEach((e) => {
-            e.addEventListener('change', calculatePrediction);
-         });
-
-         // Set model choice from the server
-         select_model.addEventListener('change', async () => {
-            // Get the model choice
-            const model_name = select_model.value;
-            // Check valid value
-            if (!model_name) {
-               return;
-            }
+         async function changeModel() {
+            const modelName = selectModel.value;
+            if (!modelName) return;
             try {
-               // Change server model
-               const resp = await fetch("/change_model", {
-                  method: "POST",
-                  headers: {
-                     "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                     model_file: model_name,
-                  }),
-               }).then(async response => {
-                  if (!response.ok) {
-                     throw new Error("Network response was not OK");
-                  }
-                  console.log("Model changed successfully to: ", model_name);
+               const response = await fetch('/change_model', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ model_file: modelName })
                });
-            } catch (err) {
-               console.error("Error changing model: ", err);
+               if (!response.ok) {
+                  throw new Error(`Server responded with status ${response.status}`);
+               }
+               console.log(`Model changed successfully to: ${modelName}`);
             }
+            catch (err) {
+               console.error('Error changing model:', err);
+            }
+         }
+         //// Initialization
+         // When either select changes, recalc everything (sprites + stats + prediction)
+         [selectFirst, selectSecond].forEach((sel) => {
+            sel.addEventListener('change', calculatePrediction);
          });
-
-         btn_stats.addEventListener('click', () => {
-            stats_first_pokemon_container.classList.toggle('hidden');
-            stats_second_pokemon_container.classList.toggle('hidden');
+         // When the model dropdown changes, tell the server
+         selectModel.addEventListener('change', changeModel);
+         // Toggle stats panels when the "Stats" button is clicked
+         btnStats.addEventListener('click', () => {
+            statsFirstContainer.classList.toggle('hidden');
+            statsSecondContainer.classList.toggle('hidden');
          });
+         // Kick off an initial prediction on page load
+         calculatePrediction();
       </script>
    </body>
 </html>
