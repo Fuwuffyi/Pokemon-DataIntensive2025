@@ -22,9 +22,9 @@ def function_transformer(dataframe, dataframe_type_chart):
    dataframe: pd.DataFrame = get_dual_multiplier(dataframe, 'Type 2_F', 'Type 1_S', 'Type 2_S', 'F2_to_S')
    dataframe: pd.DataFrame = get_dual_multiplier(dataframe, 'Type 1_S', 'Type 1_F', 'Type 2_F', 'S1_to_F')
    dataframe: pd.DataFrame = get_dual_multiplier(dataframe, 'Type 2_S', 'Type 1_F', 'Type 2_F', 'S2_to_F')
-   # Calcolo dell'efficacia di tipo
-   dataframe['Type Effectiveness_F'] = dataframe['F1_to_S'] * dataframe['F2_to_S']
-   dataframe['Type Effectiveness_S'] = dataframe['S1_to_F'] * dataframe['S2_to_F']
+   # Calcolo dell'efficacia di tipo utilizznado il log2 (valori negativi per input [~0.0, ~1.0])   
+   dataframe['Type Effectiveness_F'] = np.log2((dataframe['F1_to_S'] * dataframe['F2_to_S']).replace(0.0, 0.125))
+   dataframe['Type Effectiveness_S'] = np.log2((dataframe['S1_to_F'] * dataframe['S2_to_F']).replace(0.0, 0.125))
    dataframe.drop(columns=['F1_to_S', 'F2_to_S', 'S1_to_F', 'S2_to_F'], inplace=True)
    # Rimozione delle colonne di tipo originali
    dataframe.drop(columns=['Type 1_F', 'Type 2_F', 'Type 1_S', 'Type 2_S'], inplace=True)
