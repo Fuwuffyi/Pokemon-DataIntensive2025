@@ -91,14 +91,47 @@
          }
 
          #prediction_controls {
+            transition: transform 0.1s ease-in-out;
+            --hide-x: calc(-50% - var(--gap-size));
+            --hide-y: 105%;
             position: absolute;
-            top: calc(var(--button-height) + 2 * var(--gap-size));
-            left: 0;
+            width: calc(50% - 4 * var(--gap-size));
+            height: 12.5%;
+            border-radius: var(--border-radius);
+            background: rgba(0, 0, 0, 0.75);
+            margin: var(--gap-size);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(var(--hide-x));
+         }
+
+         #prediction_controls form {
             display: flex;
             flex-direction: column;
-            align-items: center;
             gap: var(--gap-size);
-            width: min-content;
+            height: 100%;
+            padding: var(--gap-size);
+            justify-content: space-around;
+         }
+
+         #prediction_controls .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--gap-size);
+         }
+
+         #prediction_controls select {
+            flex: 1;
+            height: var(--button-height);
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            border: 2px solid white;
+            border-radius: var(--border-radius);
+            font-family: "Pokemon Classic", sans-serif;
+            font-size: 1.2rem;
+            padding: 0 0.5rem;
+            cursor: pointer;
+            transition: background 0.1s ease-in-out, border-color 0.1s ease-in-out;
          }
 
          #prediction_results {
@@ -120,11 +153,10 @@
          }
 
          #stats_first_pokemon, #stats_second_pokemon {
+            margin: var(--gap-size);
             position: absolute;
             width: 25%;
             height: 40%;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             background-color: rgba(0, 0, 0, 0.75);
@@ -134,10 +166,6 @@
             overflow: hidden;
          }
 
-         #stats_first_pokemon.hidden, #stats_second_pokemon.hidden {
-            transform: translateX(var(--hide-x)) translateY(100%);
-         }
-
          #stats_first_pokemon img:first-of-type, #stats_second_pokemon img:first-of-type {
             width: auto;
             height: 100%;
@@ -145,15 +173,17 @@
          }
 
          #stats_first_pokemon {
-            --hide-x: -100%;
+            --hide-x: -105%;
+            --hide-y: 0;
             left: 0;
-            bottom: 0;
+            top: calc(var(--button-height) + 2 * var(--gap-size));
          }
 
          #stats_second_pokemon {
-            --hide-x: 100%;
+            --hide-x: 105%;
+            --hide-y: 0;
             right: 0;
-            bottom: 0;
+            top: calc(var(--button-height) + 2 * var(--gap-size));
          }
 
          .first_type, .second_type {
@@ -170,6 +200,10 @@
          .second_type {
             right: var(--gap-size);
          }
+
+         .hidden {
+            transform: translate(var(--hide-x), var(--hide-y)) !important;
+         }
       </style>
    </head>
    <body>
@@ -177,24 +211,26 @@
          <img id="first_pokemon_sprite" />
          <img id="second_pokemon_sprite" />
          <section id="top_controls">
+            <button id="btn_config">Configuration</button>
             <button id="btn_stats">Stats</button>
-            <button id="btn_create_custom_pkmn">Create Pokemon</button>
          </section>
          <section id="prediction_controls">
             <form>
+               <div class="form-row">
+                  <select id="pokemon_first">
+                     {% for pokemon in pokemon_choices %}
+                        <option value="{{ pokemon.Name }}" data-type-first="{{ pokemon['Type 1'] }}" data-type-second="{{ pokemon['Type 2'] }}">{{ pokemon.Name }}</option>
+                     {% endfor %}
+                  </select>
+                  <select id="pokemon_second">
+                     {% for pokemon in pokemon_choices %}
+                        <option value="{{ pokemon.Name }}" data-type-first="{{ pokemon['Type 1'] }}" data-type-second="{{ pokemon['Type 2'] }}">{{ pokemon.Name }}</option>
+                     {% endfor %}
+                  </select>
+               </div>
                <select id="model_file">
                   {% for model in models %}
                      <option value="{{ model }}">{{ model }}</option>
-                  {% endfor %}
-               </select>
-               <select id="pokemon_first">
-                  {% for pokemon in pokemon_choices %}
-                     <option value="{{ pokemon.Name }}" data-type-first="{{ pokemon['Type 1'] }}" data-type-second="{{ pokemon['Type 2'] }}">{{ pokemon.Name }}</option>
-                  {% endfor %}
-               </select>
-               <select id="pokemon_second">
-                  {% for pokemon in pokemon_choices %}
-                     <option value="{{ pokemon.Name }}" data-type-first="{{ pokemon['Type 1'] }}" data-type-second="{{ pokemon['Type 2'] }}">{{ pokemon.Name }}</option>
                   {% endfor %}
                </select>
             </form>
@@ -216,6 +252,7 @@
       </main>
       <script>
          const btnStats = document.getElementById('btn_stats');
+         const btnConfig = document.getElementById('btn_config');
          const selectModel = document.getElementById('model_file');
          const selectFirst = document.getElementById('pokemon_first');
          const selectSecond = document.getElementById('pokemon_second');
@@ -231,6 +268,7 @@
          const statsSecondContainer = document.getElementById('stats_second_pokemon');
          const winnerElement = document.getElementById('winner_element');
          const confidenceElement = document.getElementById('confidence_element');
+         const predictionControls = document.getElementById('prediction_controls');
 
          const resizeSprite = (sprite) => {
             const naturalWidth = sprite.naturalWidth;
@@ -349,6 +387,9 @@
          btnStats.addEventListener('click', () => {
             statsFirstContainer.classList.toggle('hidden');
             statsSecondContainer.classList.toggle('hidden');
+         });
+         btnConfig.addEventListener('click', () => {
+            predictionControls.classList.toggle('hidden');
          });
          // Kick off an initial prediction on page load
          calculatePrediction();
