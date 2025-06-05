@@ -332,6 +332,7 @@
                   throw new Error(`Server responded with status ${response.status}`);
                }
                console.log(`Model changed successfully to: ${modelName}`);
+               calculatePrediction();
             }
             catch (err) {
                console.error('Error changing model:', err);
