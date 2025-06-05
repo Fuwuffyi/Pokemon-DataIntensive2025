@@ -26,15 +26,17 @@ def remove_accents(text: str) -> str:
 
 async def download_sprite(session: aiohttp.ClientSession, sem: asyncio.Semaphore, name: str, suffix: str, base_url: str):
    # Generate the key for the URL based on the name
-   key: str = remove_accents(
-      name.lower()
-      .replace("'", "")
-      .replace(".", "")
-      .replace("-", "")
-      .replace("♀", "f")
-      .replace("♂", "m")
-      .replace(" ", "-")
-   )
+   key: str = remove_accents(name.lower())
+   simple_replacements = {
+      "'": "",
+      ".": "",
+      "-": "",
+      "♀": "f",
+      "♂": "m",
+      " ": "-",
+   }
+   for old, new in simple_replacements.items():
+      key = key.replace(old, new)
    if key.startswith("mega-"):
       key = f"{key[5:]}-mega"
    if key.endswith("-small-size"):
@@ -49,6 +51,14 @@ async def download_sprite(session: aiohttp.ClientSession, sem: asyncio.Semaphore
       key = f"{key[:len(key) - 7]}-megax"
    if key.endswith("-y-mega"):
       key = f"{key[:len(key) - 7]}-megay"
+   if key.endswith("-rotom"):
+      key = f"rotom-{key[:len(key) - 6]}"
+   if key.endswith("-kyurem"):
+      key = f"{key[:len(key) - 7]}"
+   if key.endswith("-forme"):
+      key = f"{key[:len(key) - 6]}"
+   if key.endswith("-normal"):
+      key = f"{key[:len(key) - 7]}"
    # Construct the URL and filename
    url: str = f"{base_url}{key}.gif"
    filename: str = f"{name}_{suffix}.gif"
