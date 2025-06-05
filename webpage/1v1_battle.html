@@ -143,7 +143,7 @@
             transform: translate(100%, 100%);
          }
 
-         #stats_first_pokemon img, #stats_second_pokemon img {
+         #stats_first_pokemon img:first-of-type, #stats_second_pokemon img:first-of-type {
             image-rendering: optimizeQuality;
             width: auto;
             height: 100%;
@@ -157,6 +157,22 @@
          #stats_second_pokemon {
             right: 0;
             bottom: 0;
+         }
+
+         .first_type, .second_type {
+            image-rendering: pixelated;
+            position: absolute;
+            width: 4rem;
+            height: auto;
+            top: var(--gap_size);
+         }
+
+         .first_type {
+            left: var(--gap_size);
+         }
+
+         .second_type {
+            right: var(--gap_size);
          }
       </style>
    </head>
@@ -177,12 +193,12 @@
                </select>
                <select id="pokemon_first">
                   {% for pokemon in pokemon_choices %}
-                     <option value="{{ pokemon }}">{{ pokemon }}</option>
+                     <option value="{{ pokemon.Name }}" data-type-first="{{ pokemon['Type 1'] }}" data-type-second="{{ pokemon['Type 2'] }}">{{ pokemon.Name }}</option>
                   {% endfor %}
                </select>
                <select id="pokemon_second">
                   {% for pokemon in pokemon_choices %}
-                     <option value="{{ pokemon }}">{{ pokemon }}</option>
+                     <option value="{{ pokemon.Name }}" data-type-first="{{ pokemon['Type 1'] }}" data-type-second="{{ pokemon['Type 2'] }}">{{ pokemon.Name }}</option>
                   {% endfor %}
                </select>
             </form>
@@ -193,9 +209,13 @@
          </section>
          <section id="stats_first_pokemon">
             <img id="stats_first_pokemon_radial"></img>
+            <img class="first_type" id="stats_first_pokemon_type_1" src="/static/img/types/Bug.png"></img>
+            <img class="second_type" id="stats_first_pokemon_type_2" src="/static/img/types/Bug.png"></img>
          </section>
          <section id="stats_second_pokemon">
             <img id="stats_second_pokemon_radial"></img>
+            <img class="first_type" id="stats_second_pokemon_type_1" src="/static/img/types/Bug.png"></img>
+            <img class="second_type" id="stats_second_pokemon_type_2" src="/static/img/types/Bug.png"></img>
          </section>
       </main>
       <script>
@@ -211,6 +231,11 @@
 
          const stats_first_pokemon_radial = document.getElementById('stats_first_pokemon_radial');
          const stats_second_pokemon_radial = document.getElementById('stats_second_pokemon_radial');
+
+         const stats_first_pokemon_type_1 = document.getElementById('stats_first_pokemon_type_1');
+         const stats_first_pokemon_type_2 = document.getElementById('stats_first_pokemon_type_2');
+         const stats_second_pokemon_type_1 = document.getElementById('stats_second_pokemon_type_1');
+         const stats_second_pokemon_type_2 = document.getElementById('stats_second_pokemon_type_2');
 
          const stats_first_pokemon_container = document.getElementById('stats_first_pokemon');
          const stats_second_pokemon_container = document.getElementById('stats_second_pokemon');
@@ -235,7 +260,7 @@
             first_pokemon_sprite.alt = `${p1} From Behind`;
             second_pokemon_sprite.alt = `${p2} From Front`;
             // Update the stats graphs
-            updateStatGraphs();
+            updateStats();
             try {
                // Fetch the prediction from the server
                const resp = fetch("/precdict_battle", {
@@ -262,7 +287,7 @@
             }
          };
 
-         const updateStatGraphs = async () => {
+         const updateStats = async () => {
             // Get the pokemon choices
             const p1 = select_first.value;
             const p2 = select_second.value;
@@ -272,12 +297,23 @@
                stats_second_pokemon_radial.src = "";
                return;
             }
+            // Set the pokemon radial stats images
             stats_first_pokemon_radial.src = `/pokemon/${p1}/radial_stats.png`;
             stats_second_pokemon_radial.src = `/pokemon/${p2}/radial_stats.png`;
+            // Get the pokemon types
+            const p1_type1 = select_first.options[select_first.selectedIndex].dataset.typeFirst;
+            const p1_type2 = select_first.options[select_first.selectedIndex].dataset.typeSecond;
+            const p2_type1 = select_second.options[select_second.selectedIndex].dataset.typeFirst;
+            const p2_type2 = select_second.options[select_second.selectedIndex].dataset.typeSecond;
+            // Set the type images
+            stats_first_pokemon_type_1.src = `/static/img/types/${p1_type1}.png`;
+            stats_first_pokemon_type_2.src = p1_type2 != 'None' ? `/static/img/types/${p1_type2}.png` : '';
+            stats_second_pokemon_type_1.src = `/static/img/types/${p2_type1}.png`;
+            stats_second_pokemon_type_2.src = p2_type2 != 'None' ? `/static/img/types/${p2_type2}.png` : '';
          };
 
          const updateUi = async () => {
-            updateStatGraphs();
+            updateStats();
             calculatePrediction();
          };
 
