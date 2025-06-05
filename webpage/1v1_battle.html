@@ -105,8 +105,13 @@
          }
 
          #prediction_results {
+            color: white;
+            text-shadow: 0 0 5px black;
+            position: absolute;
+            left: 50%;
+            top: 10%;
+            transform: translateX(-50%);
             display: flex;
-            flex-direction: column;
             align-items: center;
             position: absolute;
             gap: var(--gap_size);
@@ -243,7 +248,7 @@
                   }
                   data = await response.json();
                   winner_element.innerHTML = `Winner: ${data.winner}`;
-                  confidence_element.innerHTML = `Confidence: ${data.confidence.toFixed(2)}%`;
+                  confidence_element.innerHTML = `(${data.confidence.toFixed(2)}% confident)`;
                });
             } catch (err) {
                console.error("Error fetching prediction: ", err);
